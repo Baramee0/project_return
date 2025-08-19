@@ -31,6 +31,21 @@ namespace Backend.Controllers
                 return BadRequest("Email already in use.");
             }
 
+            if (register.Password.Length < 6)
+            {
+                return BadRequest("Password must be at least 6 characters long.");
+            }
+
+            if (!register.Password.Any(char.IsUpper))
+            {
+                return BadRequest("Password must contain at least one uppercase letter.");
+            }
+            
+            if (!register.Password.Any(char.IsLower))
+            {
+                return BadRequest("Password must contain at least one lowercase letter.");
+            }
+
             //Hash password
             string hashedPassword = _passwordService.HashPassword(register.Password);
 
@@ -51,16 +66,18 @@ namespace Backend.Controllers
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
-                CreatedAt = user.CreatedAt,
-                UpdatedAt = user.UpdatedAt
+                CreatedAt = user.CreatedAt
+                // UpdatedAt = user.UpdatedAt
             };
 
-            string token = _jwtService.GenerateToken(user);
+            //string token = _jwtService.GenerateToken(user);
+            string successMessage = "User registered successfully.";
 
-            return Ok(new AuthResponse
+            return Ok(new
             {
-                User = user,
-                Token = token // Replace with actual JWT token generation logic",
+                Message = successMessage,
+                User = userResponse,
+                //Token = token // Replace with actual JWT token generation logic",
             });
         }
     }

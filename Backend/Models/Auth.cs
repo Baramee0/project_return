@@ -34,7 +34,7 @@ namespace Backend.Models
     public class AuthResponse
     {
         public User User { get; set; }
-        public string Token { get; set; } = string.Empty;
+        //public string Token { get; set; } = string.Empty;
     }
 
     public class UserResponse
@@ -44,6 +44,6 @@ namespace Backend.Models
         public string LastName { get; set; }
         public string Email { get; set; }
         public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        // public DateTime? UpdatedAt { get; set; }
     }
 }
