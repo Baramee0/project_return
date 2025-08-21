@@ -33,8 +33,9 @@ namespace Backend.Models
 
     public class AuthResponse
     {
-        public User User { get; set; }
-        //public string Token { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
+        public UserResponse User { get; set; } = new();
+        public string Token { get; set; } = string.Empty;
     }
 
     public class UserResponse

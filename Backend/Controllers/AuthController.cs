@@ -40,7 +40,7 @@ namespace Backend.Controllers
             {
                 return BadRequest("Password must contain at least one uppercase letter.");
             }
-            
+
             if (!register.Password.Any(char.IsLower))
             {
                 return BadRequest("Password must contain at least one lowercase letter.");
@@ -78,6 +78,37 @@ namespace Backend.Controllers
                 Message = successMessage,
                 User = userResponse,
                 //Token = token // Replace with actual JWT token generation logic",
+            });
+        }
+
+        [HttpPost("login")]
+        public async Task<ActionResult<AuthResponse>> Login(Login login)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == login.Email);
+
+            if (user == null || !_passwordService.VerifyPassword(login.Password, user.Password))
+            {
+                return Unauthorized("Invalid email or password.");
+            }
+
+            var userResponse = new UserResponse
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                CreatedAt = user.CreatedAt
+                // UpdatedAt = user.UpdatedAt
+            };
+
+            string token = _jwtService.GenerateToken(user);
+            string successMessage = "Login successful.";
+
+            return Ok(new
+            {
+                Message = successMessage,
+                User = userResponse,
+                Token = token // Replace with actual JWT token generation logic",
             });
         }
     }
