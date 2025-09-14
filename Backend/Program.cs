@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddAuthorization();
 
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -40,10 +41,13 @@ if (secretKey.Length < 32)
     throw new InvalidOperationException($"JWT Secret Key must be at least 32 characters long. Current length: {secretKey.Length}");
 }
 
-// Debug output (remove in production)
-Console.WriteLine($"JWT Secret Key Length: {secretKey.Length} characters");
-Console.WriteLine($"JWT Issuer: {issuer}");
-Console.WriteLine($"JWT Audience: {audience}");
+// Debug output in development only
+if (builder.Environment.IsDevelopment())
+{
+    Console.WriteLine($"JWT Secret Key Length: {secretKey.Length} characters");
+    Console.WriteLine($"JWT Issuer: {issuer}");
+    Console.WriteLine($"JWT Audience: {audience}");
+}
 
 var key = Encoding.UTF8.GetBytes(secretKey);
 

@@ -1,6 +1,7 @@
 using Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Backend.Models;
 using Backend.Services;
 
@@ -22,11 +23,13 @@ namespace Backend.Controllers
             _jwtService = jwtService;
         }
 
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<ActionResult<AuthResponse>> Register(Register register)
         {
+            var email = register.Email.Trim().ToLowerInvariant();
             // Check if the email already exists
-            if (await _context.Users.AnyAsync(u => u.Email == register.Email))
+            if (await _context.Users.AnyAsync(u => u.Email == email))
             {
                 return BadRequest("Email already in use.");
             }
@@ -53,7 +56,7 @@ namespace Backend.Controllers
             {
                 FirstName = register.FirstName,
                 LastName = register.LastName,
-                Email = register.Email,
+                Email = email,
                 Password = hashedPassword
             };
 
@@ -70,21 +73,23 @@ namespace Backend.Controllers
                 // UpdatedAt = user.UpdatedAt
             };
 
-            //string token = _jwtService.GenerateToken(user);
+            string token = _jwtService.GenerateToken(user);
             string successMessage = "User registered successfully.";
 
-            return Ok(new
+            return Ok(new AuthResponse
             {
                 Message = successMessage,
                 User = userResponse,
-                //Token = token // Replace with actual JWT token generation logic",
+                Token = token
             });
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<ActionResult<AuthResponse>> Login(Login login)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == login.Email);
+            var email = login.Email.Trim().ToLowerInvariant();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
             if (user == null || !_passwordService.VerifyPassword(login.Password, user.Password))
             {
@@ -104,11 +109,11 @@ namespace Backend.Controllers
             string token = _jwtService.GenerateToken(user);
             string successMessage = "Login successful.";
 
-            return Ok(new
+            return Ok(new AuthResponse
             {
                 Message = successMessage,
                 User = userResponse,
-                Token = token // Replace with actual JWT token generation logic",
+                Token = token
             });
         }
     }

@@ -1,8 +1,11 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Models
 {
+    [Index(nameof(Email), IsUnique = true)]
     public class User
     {
         [Key]
@@ -22,6 +25,7 @@ namespace Backend.Models
 
         [Required]
         [MinLength(6)]
+        [JsonIgnore]
         public string Password { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
